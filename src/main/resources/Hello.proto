@@ -1,0 +1,15 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package de.rhojin.grpc;
+
+service Hello {
+  rpc SayHello (HelloRequest) returns (HelloResponse) {}
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloResponse {
+  string message = 1;
+}
