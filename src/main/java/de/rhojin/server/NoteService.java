@@ -29,6 +29,7 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     public void createNote(Note request, StreamObserver<Empty> responseObserver) {
         System.out.println("createNote()");
         idToNote.put(request.getId(), request);
+        responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
 
@@ -36,6 +37,7 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     public void updateNote(Note request, StreamObserver<Empty> responseObserver) {
         System.out.println("updateNote()");
         idToNote.put(request.getId(), request);
+        responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
 
