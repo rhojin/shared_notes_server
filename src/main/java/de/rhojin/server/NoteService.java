@@ -3,6 +3,7 @@ package de.rhojin.server;
 import de.rhojin.grpc.*;
 import io.grpc.stub.StreamObserver;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,9 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     @Override
     public void createNote(Note request, StreamObserver<Empty> responseObserver) {
         System.out.println("createNote()");
-        idToNote.put(request.getId(), request);
+        int id = idToNote.isEmpty() ? 0 : Collections.max(idToNote.keySet()) + 1;
+        Note note = Note.newBuilder().setId(id).setIndex(id).setText(request.getText()).build();
+        idToNote.put(note.getId(), note);
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
