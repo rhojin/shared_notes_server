@@ -3,8 +3,7 @@ package de.rhojin.server;
 import de.rhojin.grpc.*;
 import io.grpc.stub.StreamObserver;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,9 +21,27 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     }
 
     @Override
-    public void getNotes(Empty request, StreamObserver<NoteResponse> responseObserver) {
+    public void getTopics(Empty request, StreamObserver<Topics> responseObserver) {
+        System.out.println("getTopics()");
+        Set<Topic> topics = idToNote.values().stream().map(Note::getTopic).collect(Collectors.toUnmodifiableSet());
+        Topics response = Topics.newBuilder().addAllTopic(topics).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getNotesByTopic(Topic request, StreamObserver<Notes> responseObserver) {
+        System.out.println("getNotesByTopic() " + request.getText());
+        List<Note> notesByTopic = idToNote.values().stream().filter(note -> Objects.equals(note.getTopic(), request)).toList();
+        Notes response = Notes.newBuilder().addAllNote(notesByTopic).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getNotes(Empty request, StreamObserver<Notes> responseObserver) {
         System.out.println("getNotes()");
-        NoteResponse response = NoteResponse.newBuilder().addAllNote(idToNote.values()).build();
+        Notes response = Notes.newBuilder().addAllNote(idToNote.values()).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
