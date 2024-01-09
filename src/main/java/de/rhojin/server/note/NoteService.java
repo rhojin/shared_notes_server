@@ -1,32 +1,26 @@
-package de.rhojin.server;
+package de.rhojin.server.note;
 
 import de.rhojin.grpc.*;
 import io.grpc.stub.StreamObserver;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
 
 
-    private final MongoManager mongoManager;
+    private final NoteManager noteManager;
     private final Map<Integer, Note> idToNote;
 
-    public NoteService(MongoManager mongoManager) {
-        this.mongoManager = mongoManager;
-        idToNote = mongoManager.load()
+    public NoteService(NoteManager noteManager) {
+        this.noteManager = noteManager;
+        idToNote = noteManager.load()
                 .stream()
                 .collect(Collectors.toMap(Note::getId, Function.identity()));
-    }
-
-    @Override
-    public void getTopics(Empty request, StreamObserver<Topics> responseObserver) {
-        System.out.println("getTopics()");
-        Set<Topic> topics = idToNote.values().stream().map(Note::getTopic).collect(Collectors.toUnmodifiableSet());
-        Topics response = Topics.newBuilder().addAllTopic(topics).build();
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
     }
 
     @Override
@@ -57,9 +51,9 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     public void createNote(Note request, StreamObserver<Empty> responseObserver) {
         System.out.println("createNote()");
         int id = idToNote.isEmpty() ? 0 : Collections.max(idToNote.keySet()) + 1;
-        Note note = Note.newBuilder().setId(id).setIndex(id).setText(request.getText()).build(); //TODO: is this necessary or can 'request' just be used?
+        Note note = Note.newBuilder().setId(id).setIndex(id).setText(request.getText()).setTopic(request.getTopic()).build();
         idToNote.put(note.getId(), note);
-        mongoManager.create(note);
+        noteManager.create(note);
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
@@ -68,7 +62,7 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     public void updateNote(Note request, StreamObserver<Empty> responseObserver) {
         System.out.println("updateNote()");
         idToNote.put(request.getId(), request);
-        mongoManager.update(request);
+        noteManager.update(request);
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
@@ -77,7 +71,7 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     public void deleteNote(NoteId request, StreamObserver<Note> responseObserver) {
         System.out.println("deleteNote()");
         Note note = idToNote.remove(request.getId());
-        mongoManager.delete(note);
+        noteManager.delete(note);
         responseObserver.onNext(note);
         responseObserver.onCompleted();
     }

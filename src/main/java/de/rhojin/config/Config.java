@@ -4,6 +4,6 @@ import lombok.ToString;
 
 @ToString
 public class Config {
-    public int port;
+    public int grpcPort;
     public MongoDb mongoDb;
 }

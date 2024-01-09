@@ -1,9 +1,10 @@
 {
-  "port": 8080,
+  "grpcPort": 8080,
   "mongoDb": {
     "ip": "127.0.0.1",
     "port": "27017",
     "databaseName": "sharedNotesDb",
-    "collectionName": "notes"
+    "notesCollectionName": "notes",
+    "topicsCollectionName": "topics"
   }
 }

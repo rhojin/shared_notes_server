@@ -1,4 +1,4 @@
-package de.rhojin.server;
+package de.rhojin.server.note;
 
 import com.google.protobuf.util.JsonFormat;
 import de.rhojin.grpc.Note;

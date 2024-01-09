@@ -8,5 +8,6 @@ public class MongoDb {
     public String ip;
     public String port;
     public String databaseName;
-    public String collectionName;
+    public String notesCollectionName;
+    public String topicsCollectionName;
 }
