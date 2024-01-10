@@ -6,7 +6,6 @@ import io.grpc.stub.StreamObserver;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,7 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
         System.out.println("getNotesByTopic() " + request.getText());
         List<Note> notesByTopic = idToNote.values()
                 .stream()
-                .filter(note -> Objects.equals(note.getTopic(), request))
+                .filter(note -> note.getTopic().getId() == request.getId())
                 .toList();
         Notes response = Notes.newBuilder().addAllNote(notesByTopic).build();
         responseObserver.onNext(response);

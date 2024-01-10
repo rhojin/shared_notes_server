@@ -7,6 +7,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import de.rhojin.grpc.Note;
 import de.rhojin.grpc.Topic;
+import de.rhojin.server.topic.TopicConverter;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -44,7 +45,9 @@ public class NoteManager {
 
     public void updateByTopic(Topic topic) {
         Bson filterQuery = Filters.eq("topic.id", topic.getId());
-        Bson updateQuery = Updates.set("topic", topic);
+        Document topicDocument = TopicConverter.create().topic2document(topic);
+        topicDocument.remove("_id");
+        Bson updateQuery = Updates.set("topic", topicDocument);
         getCollection().updateMany(filterQuery, updateQuery);
     }
 
