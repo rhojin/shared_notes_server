@@ -4,9 +4,12 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import de.rhojin.grpc.Note;
+import de.rhojin.grpc.Topic;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,9 +42,20 @@ public class NoteManager {
         getCollection().replaceOne(Filters.eq("_id", note.getId()), document);
     }
 
+    public void updateByTopic(Topic topic) {
+        Bson filterQuery = Filters.eq("topic.id", topic.getId());
+        Bson updateQuery = Updates.set("topic", topic);
+        getCollection().updateMany(filterQuery, updateQuery);
+    }
+
     public void delete(Note note) {
         Document document = NoteConverter.create().note2document(note);
         getCollection().deleteOne(document);
+    }
+
+    public void deleteByTopic(Topic topic) {
+        Bson query = Filters.eq("topic.id", topic.getId());
+        getCollection().deleteMany(query);
     }
 
     private MongoCollection<Document> getCollection() {

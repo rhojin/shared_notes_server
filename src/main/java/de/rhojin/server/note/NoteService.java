@@ -24,18 +24,23 @@ public class NoteService extends NoteServiceGrpc.NoteServiceImplBase {
     }
 
     @Override
-    public void getNotesByTopic(Topic request, StreamObserver<Notes> responseObserver) {
-        System.out.println("getNotesByTopic() " + request.getText());
-        List<Note> notesByTopic = idToNote.values().stream().filter(note -> Objects.equals(note.getTopic(), request)).toList();
-        Notes response = Notes.newBuilder().addAllNote(notesByTopic).build();
+    public void getAllNotes(Empty request, StreamObserver<Notes> responseObserver) {
+        System.out.println("getNotes()");
+
+        Notes response = Notes.newBuilder().addAllNote(idToNote.values()).build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
-    public void getNotes(Empty request, StreamObserver<Notes> responseObserver) {
-        System.out.println("getNotes()");
-        Notes response = Notes.newBuilder().addAllNote(idToNote.values()).build();
+    public void getNotesByTopic(Topic request, StreamObserver<Notes> responseObserver) {
+        System.out.println("getNotesByTopic() " + request.getText());
+        List<Note> notesByTopic = idToNote.values()
+                .stream()
+                .filter(note -> Objects.equals(note.getTopic(), request))
+                .toList();
+        Notes response = Notes.newBuilder().addAllNote(notesByTopic).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

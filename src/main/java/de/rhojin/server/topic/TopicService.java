@@ -1,6 +1,7 @@
 package de.rhojin.server.topic;
 
 import de.rhojin.grpc.*;
+import de.rhojin.server.note.NoteManager;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Collections;
@@ -9,18 +10,20 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TopicService extends TopicServiceGrpc.TopicServiceImplBase {
+    private final NoteManager notesManager;
     private final TopicManager topicManager;
     private final Map<Integer, Topic> idToTopic;
 
-    public TopicService(TopicManager topicManager) {
+    public TopicService(TopicManager topicManager, NoteManager notesManager) {
         this.topicManager = topicManager;
+        this.notesManager = notesManager;
         idToTopic = topicManager.load()
                 .stream()
                 .collect(Collectors.toMap(Topic::getId, Function.identity()));
     }
 
     @Override
-    public void getTopics(Empty request, StreamObserver<Topics> responseObserver) {
+    public void getAllTopics(Empty request, StreamObserver<Topics> responseObserver) {
         System.out.println("getTopics()");
         Topics response = Topics.newBuilder().addAllTopic(idToTopic.values()).build();
         responseObserver.onNext(response);
@@ -43,6 +46,7 @@ public class TopicService extends TopicServiceGrpc.TopicServiceImplBase {
         System.out.println("updateTopic()");
         idToTopic.put(request.getId(), request);
         topicManager.update(request);
+        notesManager.updateByTopic(request);
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
@@ -52,6 +56,7 @@ public class TopicService extends TopicServiceGrpc.TopicServiceImplBase {
         System.out.println("deleteTopic()");
         Topic topic = idToTopic.remove(request.getId());
         topicManager.delete(topic);
+        notesManager.deleteByTopic(topic);
         responseObserver.onNext(topic);
         responseObserver.onCompleted();
     }

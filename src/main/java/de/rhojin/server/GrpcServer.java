@@ -27,7 +27,7 @@ public class GrpcServer {
         Server server = ServerBuilder
                 .forPort(config.grpcPort)
                 .addService(new NoteService(noteManager))
-                .addService(new TopicService(topicManager))
+                .addService(new TopicService(topicManager, noteManager))
                 .build();
 
         server.start();
